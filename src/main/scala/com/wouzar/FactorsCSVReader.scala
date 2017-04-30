@@ -1,4 +1,4 @@
-package com.java.wouzar
+package com.wouzar
 
 import scala.util.Try
 

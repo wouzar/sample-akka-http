@@ -1,4 +1,4 @@
-package com.java.wouzar
+package com.wouzar
 
 /**
   * Created by wouzar on 30.04.17.
