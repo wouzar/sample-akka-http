@@ -1,16 +1,17 @@
+package com.wouzar
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.stream.ActorMaterializer
-import com.wouzar.Calculator
 import com.wouzar.repository.FactorsRepository
 
 import scala.io.StdIn
-import scala.util.{Failure, Try}
-import scala.xml.{Elem, NodeSeq}
+import scala.util.Try
+import scala.xml.NodeSeq
 
 /**
   * Created by wouzar on 30.04.17.
