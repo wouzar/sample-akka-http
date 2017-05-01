@@ -52,9 +52,11 @@ object WebServer extends ScalaXmlSupport {
               } yield {
                 calculator.doCalculation(v2, v3, v4)
               }
-              result.map { x =>
-                val resp = if (x) "0" else "1"
-                complete(resp)
+              result.map { condition =>
+                complete(
+                  <result>
+                    {if (condition) 0 else 1}
+                  </result>)
               }.getOrElse(
                 complete(HttpResponse(BadRequest, entity = "Wrong parameters!"))
               )
