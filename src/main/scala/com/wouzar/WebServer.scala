@@ -23,7 +23,6 @@ trait Routes extends ScalaXmlSupport {
 
   implicit val system: ActorSystem
   implicit val materializer: ActorMaterializer
-  implicit val executionContext: ExecutionContext
 
   val calculator: Calculator
 
@@ -32,14 +31,12 @@ trait Routes extends ScalaXmlSupport {
     Try(newNs.text.toInt)
   }
 
-  val route: Route =
+  val routes: Route =
     path("rest" / "calc") {
       get {
         parameter('v1.as[Int]) { v1 =>
           complete(
-            <result>
-              {calculator.correctFactor(v1).value}
-            </result>
+            <result>{calculator.correctFactor(v1).value}</result>
           )
         }
       } ~
@@ -54,9 +51,8 @@ trait Routes extends ScalaXmlSupport {
             }
             result.map { condition =>
               complete(
-                <result>
-                  {if (condition) 0 else 1}
-                </result>)
+                <result>{if (condition) 0 else 1}</result>
+              )
             }.getOrElse(
               complete(HttpResponse(BadRequest, entity = "Wrong parameters!"))
             )
@@ -66,23 +62,32 @@ trait Routes extends ScalaXmlSupport {
 
 }
 
-object WebServer extends App with Routes {
-
-  override implicit val system = ActorSystem("my-actor-system")
-  override implicit val materializer = ActorMaterializer()
-  override implicit val executionContext = system.dispatcher
+class WebServer(implicit val system: ActorSystem,
+                implicit val materializer: ActorMaterializer,
+                implicit val executionContext: ExecutionContext) extends Routes {
 
   val repository = new FactorsRepository("f1.csv", "f2.csv")
   val calculator = new Calculator(repository)
 
-  val (host, port) = ("localhost", 8080)
-  val bindingFuture = Http().bindAndHandle(route, host, port)
+  def start(host: String, port: Int): Unit = {
+    val bindingFuture = Http().bindAndHandle(routes, host, port)
 
-  println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
-  StdIn.readLine()
-  bindingFuture
-    .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())
+    println(s"Server online at http://$host:$port/\nPress RETURN to stop...")
+    StdIn.readLine()
+    bindingFuture
+      .flatMap(_.unbind())
+      .onComplete(_ => system.terminate())
+  }
 
+}
+
+object WebServer extends App {
+
+  implicit val actorSystem = ActorSystem("my-actor-system")
+  implicit val materializer = ActorMaterializer()
+  implicit val executionContext = actorSystem.dispatcher
+
+  val server = new WebServer()
+  server.start("localhost", 8080)
 
 }
