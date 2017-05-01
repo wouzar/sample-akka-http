@@ -1,4 +1,4 @@
-package com.wouzar
+package com.wouzar.io
 
 /**
   * Created by wouzar on 30.04.17.

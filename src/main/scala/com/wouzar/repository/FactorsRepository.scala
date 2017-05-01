@@ -1,7 +1,7 @@
 package com.wouzar.repository
 
+import com.wouzar.io.{Factor, FactorsCSVReader, FactorsCSVWriter}
 import com.wouzar.repository.FactorsRepository.{FilePath, InputFilePath, ResultFilePath}
-import com.wouzar.{Factor, FactorsCSVReader, FactorsCSVWriter}
 
 /**
   * Created by wouzar on 30.04.17.

@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import com.wouzar.{Calculator, Factor}
+import com.wouzar.Calculator
 import com.wouzar.repository.FactorsRepository
 
 import scala.io.StdIn

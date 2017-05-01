@@ -1,5 +1,6 @@
 package com.wouzar
 
+import com.wouzar.io.Factor
 import com.wouzar.repository.FactorsRepository
 import com.wouzar.repository.FactorsRepository.{InputFilePath, ResultFilePath}
 

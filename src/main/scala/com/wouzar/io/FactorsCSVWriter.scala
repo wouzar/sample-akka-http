@@ -1,4 +1,4 @@
-package com.wouzar
+package com.wouzar.io
 
 import java.io.PrintWriter
 
