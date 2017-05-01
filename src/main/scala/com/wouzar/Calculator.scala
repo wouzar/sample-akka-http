@@ -10,8 +10,7 @@ class Calculator(repository: FactorsRepository) {
 
   def correctFactor(v1: Int): Factor = {
 
-    val f2 = repository.getFactors(ResultFilePath)
-
+    val f2 = repository.readFactors(ResultFilePath)
     // danger
     val factor = f2(v1).value
 
@@ -23,13 +22,13 @@ class Calculator(repository: FactorsRepository) {
   }
 
   def doCalculation(v2: Int, v3: Int, v4: Int): Boolean = {
-    val f1 = repository.getFactors(InputFilePath)
+    val f1 = repository.readFactors(InputFilePath)
 
     val (newValue, condition) = if (f1(v3).value + v2 < 10) {
       (f1(v3).value + v2, true)
     } else (f1(v3).value + v2, false)
 
-    repository.setFactors(v4, Factor(newValue))
+    repository.writeFactors(v4, Factor(newValue))
 
     condition
 

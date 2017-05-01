@@ -1,15 +1,21 @@
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.stream.ActorMaterializer
+import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport
+import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
+import akka.stream.ActorMaterializer
+import com.wouzar.{Calculator, Factor}
+import com.wouzar.repository.FactorsRepository
 
 import scala.io.StdIn
+import scala.util.{Failure, Try}
+import scala.xml.{Elem, NodeSeq}
 
 /**
   * Created by wouzar on 30.04.17.
   */
-object WebServer {
+object WebServer extends ScalaXmlSupport {
 
   def main(args: Array[String]): Unit = {
 
@@ -18,11 +24,42 @@ object WebServer {
 
     implicit val executionContext = system.dispatcher
 
+    val repository = new FactorsRepository("f1.csv", "f2.csv")
+    val calculator = new Calculator(repository)
+
+    def parseParameter(key: String, ns: NodeSeq): Try[Int] = {
+      val newNs = ns \ key
+      Try(newNs.text.toInt)
+    }
+
     val route =
-      path("hello") {
+      path("rest" / "calc") {
         get {
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
-        }
+          parameter('v1.as[Int]) { v1 =>
+            complete(
+              <result>
+                {calculator.correctFactor(v1).value}
+              </result>
+            )
+          }
+        } ~
+          post {
+            entity(as[NodeSeq]) { xml =>
+              val result = for {
+                v2 <- parseParameter("v2", xml)
+                v3 <- parseParameter("v3", xml)
+                v4 <- parseParameter("v4", xml)
+              } yield {
+                calculator.doCalculation(v2, v3, v4)
+              }
+              result.map { x =>
+                val resp = if (x) "0" else "1"
+                complete(resp)
+              }.getOrElse(
+                complete(HttpResponse(BadRequest, entity = "Wrong parameters!"))
+              )
+            }
+          }
       }
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)

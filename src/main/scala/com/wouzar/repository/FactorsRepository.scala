@@ -20,7 +20,7 @@ object FactorsRepository {
 class FactorsRepository(private val inputFilePath: String,
                         private val resultFilePath: String) {
 
-  def getFactors(filePathType: FilePath): Seq[Factor] = {
+  def readFactors(filePathType: FilePath): Seq[Factor] = {
 
     val filePath = filePathType match {
       case InputFilePath => inputFilePath
@@ -30,7 +30,7 @@ class FactorsRepository(private val inputFilePath: String,
     new FactorsCSVReader(filePath).readFactors()
   }
 
-  def setFactors(index: Int, result: Factor): Unit = {
+  def writeFactors(index: Int, result: Factor): Unit = {
     val factors = new FactorsCSVReader(resultFilePath).readFactors()
     new FactorsCSVWriter(resultFilePath)
       .writeFactors(factors.patch(index, Seq(result), 1))
