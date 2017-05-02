@@ -104,7 +104,7 @@ class WebServerSpec extends FlatSpec
         <v4>1</v4>
       </data>.toString
     ) ~> routes ~> check {
-      val fileResult = scala.io.Source.fromFile(RESULT_FILE_PATH).getLines().toSeq.mkString("")
+      val fileResult = FileHelper.getDataAsString(RESULT_FILE_PATH)
       responseAs[NodeSeq].map(_.text.trim) shouldBe List("1")
       fileResult shouldBe "1.5,14.0,66.3"
     }

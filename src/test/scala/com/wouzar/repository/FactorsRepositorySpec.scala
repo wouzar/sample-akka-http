@@ -1,7 +1,10 @@
 package com.wouzar.repository
 
 import java.io.{File, PrintWriter}
+import java.util.UUID
 
+import com.wouzar.FileHelper
+import com.wouzar.FileHelper.{withRepository, withRepositoryAndResultFile}
 import com.wouzar.io.Factor
 import com.wouzar.repository.FactorsRepository.InputFilePath
 import org.scalatest.{FlatSpec, Matchers}
@@ -14,20 +17,7 @@ import scala.util.{Failure, Success}
 class FactorsRepositorySpec extends FlatSpec
   with Matchers {
 
-  val inputFilePath = "f1.csv"
-  val resultFilePath = "f2.csv"
-
-  def writeToFile(filePath: String, content: String): Unit = {
-    val pw = new PrintWriter(new File(filePath))
-    pw.println(content)
-    pw.close()
-  }
-
-  val repo = new FactorsRepository(inputFilePath, resultFilePath)
-
-  "Factors repository" should "return empty list for empty file" in {
-
-    writeToFile(inputFilePath, "")
+  withRepository("")(repo => "Factors repository" should "return empty list for empty file" in {
     repo.readFactors(InputFilePath) match {
       case Success(sequence) => sequence should have size 0
       case Failure(e) =>
@@ -35,11 +25,10 @@ class FactorsRepositorySpec extends FlatSpec
         fail()
     }
 
-  }
+  })
 
-  "Factors repository" should "return meaningful value for correct data in file" in {
 
-    writeToFile(inputFilePath, "11.5,44.6")
+  withRepository("11.5,44.6")(repo => "Factors repository" should "return meaningful value for correct data in file" in {
     repo.readFactors(InputFilePath) match {
       case Success(sequence) => sequence shouldBe Seq(Factor(11.5), Factor(44.6))
       case Failure(e) =>
@@ -47,7 +36,7 @@ class FactorsRepositorySpec extends FlatSpec
         fail()
     }
 
-  }
+  })
 
   "Factors repository" should "return failure for no file existed" in {
 
@@ -56,8 +45,7 @@ class FactorsRepositorySpec extends FlatSpec
 
   }
 
-  "Factors repository" should "return failure for negative or out of bound index for factor being inserted" in {
-    writeToFile(resultFilePath, "3.0,4.5")
+  withRepository("", "3.0,4.5")(repo => "Factors repository" should "return failure for negative or out of bound index for factor being inserted" in {
     repo.writeFactors(-1, Factor(4.5)) match {
       case Success(_) => fail()
       case Failure(e) => e.isInstanceOf[IndexOutOfBoundsException]
@@ -66,17 +54,17 @@ class FactorsRepositorySpec extends FlatSpec
       case Success(_) => fail()
       case Failure(e) => e.isInstanceOf[ArrayIndexOutOfBoundsException]
     }
-  }
+  })
 
-  "Factors repository" should "correctly rewrite value in result file" in {
-    writeToFile(inputFilePath, "3.0,4.5")
-    writeToFile(resultFilePath, "1.0,5.5")
-    repo.writeFactors(2, Factor(4.5)) match {
-      case Success(_) => scala.io.Source.fromFile(resultFilePath)
-        .getLines.toSeq.mkString("") shouldBe "1.0,5.5,4.5"
-      case Failure(_) => fail()
-    }
-  }
+  withRepositoryAndResultFile("3.0,4.5", "1.0,5.5")((repo, resultFilePath) =>
+    "Factors repository" should "correctly rewrite value in result file" in {
+      repo.writeFactors(2, Factor(4.5)) match {
+        case Success(_) =>
+          FileHelper.getDataAsString(resultFilePath) shouldBe "1.0,5.5,4.5"
+        case Failure(_) =>
+          fail()
+      }
+    })
 
 
 }
