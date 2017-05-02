@@ -1,7 +1,8 @@
+package com.wouzar.repository
+
 import java.io.{File, PrintWriter}
 
-import com.wouzar.io.{Factor, FactorsCSVReader}
-import com.wouzar.repository.FactorsRepository
+import com.wouzar.io.Factor
 import com.wouzar.repository.FactorsRepository.InputFilePath
 import org.scalatest.{FlatSpec, Matchers}
 

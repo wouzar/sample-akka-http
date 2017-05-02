@@ -1,4 +1,4 @@
-package io
+package com.wouzar.io
 
 import com.wouzar.io.{Factor, FactorsCSVWriter}
 import org.scalatest.{FlatSpec, Matchers}

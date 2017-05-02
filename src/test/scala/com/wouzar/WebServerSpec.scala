@@ -24,18 +24,9 @@ class WebServerSpec extends FlatSpec
   with Routes
   with ScalaXmlSupport {
 
-  sealed trait FileContentType
+  def prepareFiles(fp1: String, fp2: String): Unit = {
 
-  case object NormalContentType extends FileContentType
-
-  case object HarmedContentType extends FileContentType
-
-  def prepareFiles(fp1: String, fp2: String)(content: FileContentType): Unit = {
-
-    val (cont1, cont2) = content match {
-      case NormalContentType => ("1.7,5.5,10", "1.5,63.4,66.3")
-      case HarmedContentType => ("1.7,5.5.5,10", "1.5f,63.4,66.3")
-    }
+    val (cont1, cont2) = ("1.7,5.5,10", "1.5,63.4,66.3")
     val pw1 = new PrintWriter(fp1)
     pw1.println(cont1)
     pw1.close()
@@ -48,10 +39,8 @@ class WebServerSpec extends FlatSpec
   implicit val INPUT_FILE_PATH = "f1.csv"
   implicit val RESULT_FILE_PATH = "f2.csv"
 
-  def _prepareFiles: (FileContentType) => Unit = prepareFiles(INPUT_FILE_PATH, RESULT_FILE_PATH)(_)
-
-  def withFiles(test: () => Unit, fileContent: FileContentType = NormalContentType): Unit = {
-    _prepareFiles(fileContent)
+  def withFiles(test: () => Unit): Unit = {
+    prepareFiles(INPUT_FILE_PATH, RESULT_FILE_PATH)
     test()
   }
 

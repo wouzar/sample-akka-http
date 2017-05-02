@@ -1,8 +1,7 @@
-package io
+package com.wouzar.io
 
 import java.io.{File, PrintWriter}
 
-import com.wouzar.io.{Factor, FactorsCSVReader}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
