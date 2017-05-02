@@ -1,7 +1,6 @@
 package io
 
 import java.io.{File, PrintWriter}
-import java.util.UUID
 
 import com.wouzar.io.{Factor, FactorsCSVReader}
 import org.scalatest.{FlatSpec, Matchers}
