@@ -167,7 +167,6 @@ class WebServerSpec extends FlatSpec
       </data>.toString
     ) ~> routes ~> check {
       status shouldBe BadRequest
-//      responseAs[NodeSeq].map(_.text.trim) shouldBe List("1")
     }
   })
 

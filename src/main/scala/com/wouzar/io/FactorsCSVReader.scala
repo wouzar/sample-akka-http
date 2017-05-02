@@ -9,11 +9,14 @@ class FactorsCSVReader(val filename: String) extends FactorsReader {
 
   override def readFactors(): Try[Seq[Factor]] =
     for {
-      line <- Try(scala.io.Source
+      lines <- Try(scala.io.Source
         .fromFile(filename)
         .getLines()
         .toSeq)
-      values <- Try(line.flatMap(_.split(",").map(_.trim)).map(x => Factor(x.toDouble)))
+      values <- Try {
+        val numbers = lines.flatMap(_.split(",").map(_.trim))
+        numbers.filter(_ != "").map(x => Factor(x.toDouble))
+      }
     } yield values
 
 }
