@@ -7,18 +7,13 @@ import scala.util.Try
   */
 class FactorsCSVReader(val filename: String) extends FactorsReader {
 
-  override def readFactors(): Seq[Factor] = {
-    val result = for {
-      line <- scala.io.Source
+  override def readFactors(): Try[Seq[Factor]] =
+    for {
+      line <- Try(scala.io.Source
         .fromFile(filename)
         .getLines()
-        .toSeq
-      values = line
-        .split(",")
-        .map(_.trim)
-        .flatMap(x => Try(Factor(x.toDouble)).toOption)
+        .toSeq)
+      values <- Try(line.flatMap(_.split(",").map(_.trim)).map(x => Factor(x.toDouble)))
     } yield values
-    result.flatten
-  }
 
 }

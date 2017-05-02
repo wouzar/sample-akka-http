@@ -1,18 +1,20 @@
 package com.wouzar
 
+import java.io.FileNotFoundException
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives.{entity, _}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Route, StandardRoute}
 import akka.stream.ActorMaterializer
 import com.wouzar.repository.FactorsRepository
 
 import scala.concurrent.ExecutionContext
 import scala.io.StdIn
-import scala.util.Try
+import scala.util.{Failure, Try}
 import scala.xml.NodeSeq
 
 /**
@@ -31,13 +33,32 @@ trait Routes extends ScalaXmlSupport {
     Try(newNs.text.toInt)
   }
 
+  def handleXMLResponse[T](_try: Try[T]): StandardRoute = {
+
+    def genResponse(msg: String) = HttpResponse(BadRequest, entity = msg)
+
+    _try match {
+      case scala.util.Success(v) =>
+        complete(<result>
+          {v}
+        </result>)
+      case Failure(_: IndexOutOfBoundsException) =>
+        complete(genResponse("Wrong parameter!"))
+      case Failure(_: FileNotFoundException) =>
+        complete(genResponse("Wrong parameter!"))
+      case Failure(_: NumberFormatException) =>
+        complete(genResponse("Corrupted data in files!"))
+      case Failure(e) =>
+        println(e.toString)
+        complete(s"Something goes wrong!")
+    }
+  }
+
   val routes: Route =
     path("rest" / "calc") {
       get {
         parameter('v1.as[Int]) { v1 =>
-          complete(
-            <result>{calculator.correctFactor(v1).value}</result>
-          )
+          handleXMLResponse(calculator.correctFactor(v1).map(_.value))
         }
       } ~
         post {
@@ -46,16 +67,11 @@ trait Routes extends ScalaXmlSupport {
               v2 <- parseParameter("v2", xml)
               v3 <- parseParameter("v3", xml)
               v4 <- parseParameter("v4", xml)
+              condition <- calculator.doCalculation(v2, v3, v4)
             } yield {
-              calculator.doCalculation(v2, v3, v4)
+              condition
             }
-            result.map { condition =>
-              complete(
-                <result>{if (condition) 0 else 1}</result>
-              )
-            }.getOrElse(
-              complete(HttpResponse(BadRequest, entity = "Wrong parameters!"))
-            )
+            handleXMLResponse(result.map(cond => if (cond) 0 else 1))
           }
         }
     }

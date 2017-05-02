@@ -3,6 +3,8 @@ package com.wouzar.repository
 import com.wouzar.io.{Factor, FactorsCSVReader, FactorsCSVWriter}
 import com.wouzar.repository.FactorsRepository.{FilePath, InputFilePath, ResultFilePath}
 
+import scala.util.Try
+
 /**
   * Created by wouzar on 30.04.17.
   */
@@ -20,7 +22,7 @@ object FactorsRepository {
 class FactorsRepository(private val inputFilePath: String,
                         private val resultFilePath: String) {
 
-  def readFactors(filePathType: FilePath): Seq[Factor] = {
+  def readFactors(filePathType: FilePath): Try[Seq[Factor]] = {
 
     val filePath = filePathType match {
       case InputFilePath => inputFilePath
@@ -30,10 +32,13 @@ class FactorsRepository(private val inputFilePath: String,
     new FactorsCSVReader(filePath).readFactors()
   }
 
-  def writeFactors(index: Int, result: Factor): Unit = {
-    val factors = new FactorsCSVReader(resultFilePath).readFactors()
-    new FactorsCSVWriter(resultFilePath)
-      .writeFactors(factors.patch(index, Seq(result), 1))
-  }
+  def writeFactors(index: Int, result: Factor): Try[Unit] =
+    for {
+      factors <- new FactorsCSVReader(resultFilePath).readFactors()
+      done <-
+      new FactorsCSVWriter(resultFilePath)
+        .writeFactors(factors.patch(index, Seq(result), 1))
+    } yield done
+
 
 }

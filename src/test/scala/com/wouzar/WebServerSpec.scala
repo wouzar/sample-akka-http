@@ -65,7 +65,7 @@ class WebServerSpec extends FlatSpec
   withFiles(() => "WebService" should "return proper value from result file in xml format" in {
     get("2") ~> routes ~> check {
       status shouldBe OK
-      responseAs[NodeSeq] shouldBe <result>56.3</result>
+      responseAs[NodeSeq].map(_.text.trim) shouldBe List("56.3")
     }
   })
 
@@ -116,7 +116,7 @@ class WebServerSpec extends FlatSpec
       </data>.toString
     ) ~> routes ~> check {
       val fileResult = scala.io.Source.fromFile(RESULT_FILE_PATH).getLines().toSeq.mkString("")
-      responseAs[NodeSeq] shouldBe <result>1</result>
+      responseAs[NodeSeq].map(_.text.trim) shouldBe List("1")
       fileResult shouldBe "1.5,14.0,66.3"
     }
   })
@@ -162,12 +162,12 @@ class WebServerSpec extends FlatSpec
     postWithXml(
       <data>
         <v2>4</v2>
-        <v3>2</v3>
+        <v3>3</v3>
         <v4>3</v4>
       </data>.toString
     ) ~> routes ~> check {
-      status shouldBe OK
-      responseAs[NodeSeq] shouldBe <result>1</result>
+      status shouldBe BadRequest
+//      responseAs[NodeSeq].map(_.text.trim) shouldBe List("1")
     }
   })
 
