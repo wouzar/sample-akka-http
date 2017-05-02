@@ -35,6 +35,7 @@ class FactorsRepository(private val inputFilePath: String,
   def writeFactors(index: Int, result: Factor): Try[Unit] =
     for {
       factors <- new FactorsCSVReader(resultFilePath).readFactors()
+      if index > 0 && index <= factors.length
       done <-
       new FactorsCSVWriter(resultFilePath)
         .writeFactors(factors.patch(index, Seq(result), 1))
