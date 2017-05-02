@@ -1,8 +1,5 @@
 package com.wouzar.repository
 
-import java.io.{File, PrintWriter}
-import java.util.UUID
-
 import com.wouzar.FileHelper
 import com.wouzar.FileHelper.{withRepository, withRepositoryAndResultFile}
 import com.wouzar.io.Factor

@@ -3,7 +3,6 @@ package com.wouzar
 import java.io.{File, FileWriter}
 import java.util.UUID
 
-import com.wouzar.io.FactorsCSVWriter
 import com.wouzar.repository.FactorsRepository
 
 /**

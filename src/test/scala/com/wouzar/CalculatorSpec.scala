@@ -1,10 +1,7 @@
 package com.wouzar
 
-import java.io.{File, PrintWriter}
-import java.util.UUID
 
 import com.wouzar.io.Factor
-import com.wouzar.repository.FactorsRepository
 import org.scalatest.{FlatSpec, Matchers}
 import FileHelper.{withCalculator, withCalculatorAndResultFile}
 
